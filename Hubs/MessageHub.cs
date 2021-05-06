@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 
 namespace IM_Api.Hubs
@@ -23,6 +24,7 @@ namespace IM_Api.Hubs
         private UserDbContext dbcontext;
 
 
+
         public MessageHub(UserDbContext _context, UserManager<IdentityUser> _userManager)
         {
             this.userManager = _userManager;
@@ -31,7 +33,14 @@ namespace IM_Api.Hubs
 
         public override Task OnConnectedAsync()
         {
-                
+            var email = Context.User.Identity.Name;
+            if (!Channels.DataChannels.ContainsKey(email))
+            {
+                Channels.DataChannels.Add(email, Channel.CreateBounded<string>(new BoundedChannelOptions(1000)
+                {
+                    FullMode = BoundedChannelFullMode.DropOldest
+                }));
+            }
             return base.OnConnectedAsync();
         }
 
@@ -40,7 +49,11 @@ namespace IM_Api.Hubs
         public override Task OnDisconnectedAsync(Exception exception)
         {
             var email = Context.User.Identity.Name;
-            Clients.All.SendAsync("RemoveUser", email);
+            if (Channels.DataChannels.ContainsKey(email))
+            {
+                Channels.DataChannels.Remove(email);
+            }
+                Clients.All.SendAsync("RemoveUser", email);
             if (UsersList.ChatUsers.Contains(email))
             {
                 UsersList.ChatUsers.Remove(email);
@@ -144,13 +157,13 @@ namespace IM_Api.Hubs
 
         public async IAsyncEnumerable<string> DownLoadStream(int delay, [EnumeratorCancellation]CancellationToken cancellationToken)
         {
-
-            while (await Channels.DataChannel.Reader.WaitToReadAsync())
+            string email = Context.User.Identity.Name;
+            while (await Channels.DataChannels[email].Reader.WaitToReadAsync())
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                if (Channels.DataChannel.Reader.TryRead(out var message))
+                if (Channels.DataChannels[email].Reader.TryRead(out var message))
                 {
-                    //System.Diagnostics.Debug.WriteLine("send: " + message);
+                    System.Diagnostics.Debug.WriteLine("send: " + message);
                     yield return message;
                 }
                 //await Task.Delay(delay, cancellationToken);
@@ -163,7 +176,11 @@ namespace IM_Api.Hubs
             await foreach (var item in stream)
             {
                 //System.Diagnostics.Debug.WriteLine("recevie: " + item);
-                await Channels.DataChannel.Writer.WriteAsync(item);
+                foreach(var user in Channels.DataChannels.Keys)
+                {
+                    await Channels.DataChannels[user].Writer.WriteAsync(item);
+                }
+                
             }
         }
 

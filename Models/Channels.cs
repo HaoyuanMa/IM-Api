@@ -8,9 +8,10 @@ namespace IM_Api.Models
 {
     public static class Channels
     {
-        public static Channel<string> DataChannel = Channel.CreateBounded<string>(new BoundedChannelOptions(1000)
-        {
-            FullMode = BoundedChannelFullMode.DropOldest
-        });
+       
+
+        public static Dictionary<string, Channel<string>> DataChannels = new Dictionary<string, Channel<string>>();
+
+
     }
 }
