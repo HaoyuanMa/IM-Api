@@ -15,7 +15,7 @@ namespace IM_Api.Hubs
 {
 
     //[EnableCors("any")]
-    //[Authorize]
+    [Authorize]
     public class MessageHub : Hub
     {
 
@@ -34,13 +34,7 @@ namespace IM_Api.Hubs
         public override Task OnConnectedAsync()
         {
             var email = Context.User.Identity.Name;
-            if (!Channels.DataChannels.ContainsKey(email))
-            {
-                Channels.DataChannels.Add(email, Channel.CreateBounded<string>(new BoundedChannelOptions(1000)
-                {
-                    FullMode = BoundedChannelFullMode.DropOldest
-                }));
-            }
+            
             return base.OnConnectedAsync();
         }
 
@@ -67,6 +61,12 @@ namespace IM_Api.Hubs
                 UsersList.ChatRoomUsers.Remove(email);
             }
             Groups.RemoveFromGroupAsync(Context.ConnectionId, "mygroup");
+
+            if (Channels.DataChannels.ContainsKey(email))
+            {
+                Channels.DataChannels.Remove(email);
+            }
+
             return base.OnDisconnectedAsync(exception);
         }
 
@@ -101,7 +101,7 @@ namespace IM_Api.Hubs
                 }
                 
             }
-            else
+            else if(type == "chatroom")
             {
                 List<string> users = UsersList.ChatRoomUsers;
                 
@@ -112,7 +112,17 @@ namespace IM_Api.Hubs
                     UsersList.ChatRoomUsers.Add(email);
                 }
                 await Groups.AddToGroupAsync(Context.ConnectionId, "mygroup");
-            }         
+            }  
+            else if(type == "stream")
+            {
+                if (!Channels.DataChannels.ContainsKey(email))
+                {
+                    Channels.DataChannels.Add(email, Channel.CreateBounded<string>(new BoundedChannelOptions(100)
+                    {
+                        FullMode = BoundedChannelFullMode.DropOldest
+                    }));
+                }
+            }
         }
 
 
