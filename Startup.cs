@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -35,6 +37,12 @@ namespace IM_Api
 
             services.Configure<IdentityOptions>(options =>
             {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 1;
+                options.Password.RequiredUniqueChars = 1;
                 options.ClaimsIdentity.UserNameClaimType = "name";
             });
 
@@ -84,12 +92,7 @@ namespace IM_Api
 
                   }
                   );
-            services.AddCors(option => option.AddPolicy("cors", policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(new []{ "http://localhost:8080" })));
-
-            /*services.AddCors(options => {
-                options.AddPolicy("any", builder => { builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader(); });
-            });*/
-
+            services.AddCors(option => option.AddPolicy("cors", policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(new []{ "http://182.92.183.106:5000" })));
 
             services.AddAuthorization();
 
@@ -99,7 +102,6 @@ namespace IM_Api
                 options.MaximumReceiveMessageSize = 200 * 1024;
             });
             services.AddSingleton<IUserIdProvider, NameUserIdProvider>();
-
 
             services.AddControllers();
             
@@ -115,10 +117,11 @@ namespace IM_Api
             }
 
             
-            app.UseStaticFiles(new StaticFileOptions { 
+            app.UseStaticFiles(new StaticFileOptions {
+                FileProvider = new PhysicalFileProvider("C:\\inetpub\\IMApi"),
                 OnPrepareResponse = c =>
                 {
-                    c.Context.Response.Headers.Add("Access-Control-Allow-Origin", "http://localhost:8080");
+                    c.Context.Response.Headers.Add("Access-Control-Allow-Origin", "http://182.92.183.106:5000");
                 }
             });
 

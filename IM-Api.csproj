@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>IM_Api</RootNamespace>
+    <UserSecretsId>45cdc913-5236-4939-8a71-9baf0b48b07d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

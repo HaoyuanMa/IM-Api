@@ -8,7 +8,6 @@ namespace IM_Api.Models
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
         [StringLength(14, MinimumLength = 1)]
         public string Username { get; set; }
 

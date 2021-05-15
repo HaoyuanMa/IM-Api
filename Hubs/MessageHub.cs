@@ -139,18 +139,18 @@ namespace IM_Api.Hubs
 
         public async Task UploadFile(IAsyncEnumerable<BinData> stream)
         {
-            var path = Directory.GetCurrentDirectory();
+            var path = "C:\\inetpub\\IMApi";
             FileStream fileStream = null;
             BinaryWriter binaryWriter = null;
             await foreach (var item in stream)
             {
                 if(item.Order == 0)
                 {
-                    var dir = path + "\\wwwroot\\UploadFiles\\" + item.From;
+                    var dir = path + "\\UploadFiles\\" + item.From;
                     //System.Diagnostics.Debug.WriteLine(dir);
                     if (!Directory.Exists(dir)) ;
                     {
-                        Directory.CreateDirectory(dir);
+                         Directory.CreateDirectory(dir);
                     }
                     var file = dir + "\\" + item.Name;
                     fileStream = new FileStream(file, FileMode.Append, FileAccess.Write);

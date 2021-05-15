@@ -31,7 +31,7 @@ namespace IM_Api.Controllers
             {
                 var user = new IdentityUser
                 {
-                    UserName = model.Username,
+                    UserName = model.Email,
                     Email = model.Email
                 };
 
@@ -43,7 +43,12 @@ namespace IM_Api.Controllers
                 }
                 else
                 {
-                    return Content("err1");
+                    var str = "";
+                    foreach(var err in result.Errors)
+                    {
+                        str += err.ToString();
+                    }
+                    return Content(str);
                 }
             }
             else
