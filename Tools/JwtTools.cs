@@ -1,4 +1,4 @@
-﻿using IdentityModel;
+k﻿using IdentityModel;
 using IM_Api.Models;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -15,7 +15,7 @@ namespace IM_Api.Tools
     {
         private static string issuer = "mahaoyuan";
         private static string audience = null;
-        private static SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SKDJF5D4SG65WE8SD56G4A8SD5FWE5"));
+        private static SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("testkey"));
 
 
         public static string GenerateJwtToken(string email,string client)
