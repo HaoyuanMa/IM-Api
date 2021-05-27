@@ -61,7 +61,7 @@ namespace IM_Api
                           ValidateAudience = false,
                           ValidateLifetime = true,
                           ValidateIssuerSigningKey = true,
-                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("SKDJF5D4SG65WE8SD56G4A8SD5FWE5")),
+                          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("testkey")),
                           ValidIssuer = "mahaoyuan",
                           NameClaimType = "name"
                       };
@@ -92,7 +92,7 @@ namespace IM_Api
 
                   }
                   );
-            services.AddCors(option => option.AddPolicy("cors", policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(new []{ "http://182.92.183.106:5000" })));
+            services.AddCors(option => option.AddPolicy("cors", policy => policy.AllowAnyHeader().AllowAnyMethod().AllowCredentials().WithOrigins(new []{ "http://0.0.0.0:5000" })));
 
             services.AddAuthorization();
 
@@ -121,7 +121,7 @@ namespace IM_Api
                 FileProvider = new PhysicalFileProvider("C:\\inetpub\\IMApi"),
                 OnPrepareResponse = c =>
                 {
-                    c.Context.Response.Headers.Add("Access-Control-Allow-Origin", "http://182.92.183.106:5000");
+                    c.Context.Response.Headers.Add("Access-Control-Allow-Origin", "http://0.0.0.0:5000");
                 }
             });
 
